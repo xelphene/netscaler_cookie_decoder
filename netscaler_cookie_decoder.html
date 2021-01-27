@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+
+<script src="./netscaler_cookie_decoder.js"></script>
+
+<script>
+
+function decode()
+{
+    var input = document.getElementById('input');
+    try {
+        var d = netscalerCookieDecoder.decodeCookie(input.value);
+        document.getElementById('out_addr').innerHTML = d.addr;
+        document.getElementById('out_port').innerHTML = d.port;
+        document.getElementById('out_err').innerHTML = '';
+    } catch( err ) {
+        document.getElementById('out_addr').innerHTML = '';
+        document.getElementById('out_port').innerHTML = '';
+        document.getElementById('out_err').innerHTML = err;
+    }
+}
+
+</script>
+
+Cookie value ("NSC_..."): <input type="text" id="input" />
+<br/>
+Decoded Address: <span id="out_addr"></span>
+<br/>
+Decoded Port: <span id="out_port"></span>
+<br/>
+Error: <span id="out_err"></span>
+<br/>
+<input type="submit" value="Decode" onClick="decode()"/>
+
+</html>
