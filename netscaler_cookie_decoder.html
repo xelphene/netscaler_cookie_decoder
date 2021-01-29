@@ -7,15 +7,23 @@
 
 <script>
 
+function escapeHTML(s) {
+    return s
+        .replace('&','&amp;')
+        .replace('<','&lt;')
+        .replace('>','&gt;')
+}
+
 function decode()
 {
     var input = document.getElementById('input');
     try {
-        var d = netscalerCookieDecoder.decodeCookie(input.value);
+        var d = netscalerCookieDecoder.decode(input.value);
         document.getElementById('out_addr').innerHTML = d.addr;
         document.getElementById('out_port').innerHTML = d.port;
         document.getElementById('out_err').innerHTML = '';
     } catch( err ) {
+        err = escapeHTML(err.toString());
         document.getElementById('out_addr').innerHTML = '';
         document.getElementById('out_port').innerHTML = '';
         document.getElementById('out_err').innerHTML = err;

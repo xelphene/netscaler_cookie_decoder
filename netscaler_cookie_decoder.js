@@ -7,7 +7,7 @@
 (function () {
 
     var d = {
-        valueRE: /^NSC_([-.a-z]+)=([a-f0-9]{20,})$/,
+        valueRE: /^([a-f0-9]{20,})$/,
         portXorKey: 13872,          // 0x3630
         addrXorKey: [3, 8, 30, 17], // 0x03081e11
         decodePort: function (p) {
@@ -20,15 +20,24 @@
                 .map( (d,i) => d ^ this.addrXorKey[i] )
                 .join('.')
         },
-        decodeCookie: function (c) {
-            let m = this.valueRE.exec(c);
-            
-            if( ! m ) {
-                throw new Error(`cookie ${JSON.stringify(c)} does not match regex ${this.valueRE}`);
+        decode: function (c) {
+            c = c.replace(/^(Set-Cookie:\s+)/,'')
+            c = c.split(';')[0] // lop off cookie attributes, if present
+
+            if( c.includes('=') ) {
+                var cv = c.split('=')[1]
+            } else {
+                var cv = c;
             }
             
-            let addr = m[2].slice(8,16);
-            let port = m[2].slice(-4);
+            let m = this.valueRE.exec(cv);
+            
+            if( ! m ) {
+                throw new Error(`cookie value ${JSON.stringify(c)} does not match regex ${this.valueRE}`);
+            }
+            
+            let addr = m[1].slice(8,16);
+            let port = m[1].slice(-4);
 
             addr = this.decodeAddr(addr);
             port = this.decodePort(port);
@@ -46,7 +55,7 @@
         if( process.argv.length != 3 ) {
             console.log(`usage: ${process.argv.join(' ')} <netscaler cookie value>`);
         } else {
-            let dc = d.decodeCookie(process.argv[2]);
+            let dc = d.decode(process.argv[2]);
             console.log(`address: ${dc.addr} port: ${dc.port}`);
         }
     }
